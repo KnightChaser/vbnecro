@@ -24,6 +24,7 @@ type VMConfig struct {
 // JobConfig represents a job to perform on a VM.
 type JobConfig struct {
 	VMAlias    string      `yaml:"vm_alias"`
+	EnsureOff  bool        `yaml:"ensure_off,omitempty"`
 	Operations []Operation `yaml:"operations"`
 }
 

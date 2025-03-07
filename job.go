@@ -14,6 +14,15 @@ func ProcessJobs(cfg *Config) {
 			log.Fatalf("Job for VM alias '%s' failed: %v", job.VMAlias, err)
 		}
 
+		// Ensure the VM is turned off if specified in the job config.
+		if job.EnsureOff {
+			log.Printf("Ensuring VM '%s' is off before executing operations", vmConfig.VMName)
+			if err := vboxOperations.ShutdownVM(vmConfig.VMName); err != nil {
+				log.Fatalf("Job failed: error shutting down VM '%s': %v", vmConfig.VMName, err)
+			}
+			log.Printf("VM '%s' shut down successfully.", vmConfig.VMName)
+		}
+
 		// Process each operation defined for this job.
 		for _, op := range job.Operations {
 			switch op.Type {
