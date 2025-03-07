@@ -1,4 +1,4 @@
-package main
+package vboxOperations
 
 import (
 	"bytes"
@@ -19,7 +19,7 @@ func ListSnapshots(vmName string) (string, error) {
 	return out.String(), nil
 }
 
-// ParseSnapshot extracts a clean snapshot name from the raw snapshot listing.
+// ParseSnapshot extracts a clean snapshot name from the given raw snapshot listing.
 // It expects lines like: "Name: InitialInstallation (UUID: ...)" and returns "InitialInstallation".
 func ParseSnapshot(snapshotOutput string) (string, error) {
 	lines := strings.Split(snapshotOutput, "\n")

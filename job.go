@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"log"
+
+	"vbnecro/vboxOperations"
 )
 
 func ProcessJobs(cfg *Config) {
@@ -18,7 +20,7 @@ func ProcessJobs(cfg *Config) {
 			switch op.Type {
 			case "RestoreSnapshot":
 				log.Printf("Listing snapshots for VM '%s'", vmConfig.VMName)
-				output, err := ListSnapshots(vmConfig.VMName)
+				output, err := vboxOperations.ListSnapshots(vmConfig.VMName)
 				if err != nil {
 					log.Printf("Error listing snapshots: %v", err)
 					continue
@@ -36,7 +38,7 @@ func ProcessJobs(cfg *Config) {
 
 				// If not provided in Params, parse the first available snapshot.
 				if snapshotToRestore == "" {
-					snapshotToRestore, err = ParseSnapshot(output)
+					snapshotToRestore, err = vboxOperations.ParseSnapshot(output)
 					if err != nil {
 						log.Printf("Error parsing snapshot: %v", err)
 						continue
@@ -44,7 +46,7 @@ func ProcessJobs(cfg *Config) {
 				}
 
 				log.Printf("Restoring VM '%s' to snapshot '%s'", vmConfig.VMName, snapshotToRestore)
-				if err := RestoreSnapshot(vmConfig.VMName, snapshotToRestore); err != nil {
+				if err := vboxOperations.RestoreSnapshot(vmConfig.VMName, snapshotToRestore); err != nil {
 					log.Printf("Error restoring snapshot: %v", err)
 					continue
 				}
