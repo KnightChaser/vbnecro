@@ -1,1 +1,5 @@
+# Configuration file for users
 *.yaml
+
+# Compiled binary
+vbnecro
