@@ -44,6 +44,13 @@ func ProcessJobs(cfg *Config) {
 				}
 				log.Println("VM paused successfully!")
 
+			case "ShutdownVM":
+				log.Printf("Shutting down VM '%s'", vmConfig.VMName)
+				if err := vboxOperations.ShutdownVM(vmConfig.VMName); err != nil {
+					log.Fatalf("Job failed: error shutting down VM '%s': %v", vmConfig.VMName, err)
+				}
+				log.Println("VM shut down successfully!")
+
 			case "ExecuteShellCommand":
 				log.Printf("Preparing to execute shell command on VM '%s'", vmConfig.VMName)
 				// Wait until the guest execution service is ready.
