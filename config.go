@@ -28,9 +28,10 @@ type JobConfig struct {
 }
 
 // Operation holds the type of operation and its parameters.
+// Using Params as a map[string]interface{} allows us to flexibly pass any parameters.
 type Operation struct {
-	Type     string `yaml:"type"`
-	Snapshot string `yaml:"snapshot"`
+	Type   string                 `yaml:"type"`
+	Params map[string]interface{} `yaml:"params"`
 }
 
 // LoadConfig reads and parses the YAML configuration.

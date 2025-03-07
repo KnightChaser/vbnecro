@@ -26,11 +26,16 @@ func ProcessJobs(cfg *Config) {
 				fmt.Println("Snapshot list output:")
 				fmt.Println(output)
 
-				// Determine which snapshot to restore.
+				// Determine which snapshot to restore from the Params map.
 				var snapshotToRestore string
-				if op.Snapshot != "" {
-					snapshotToRestore = op.Snapshot
-				} else {
+				if val, ok := op.Params["snapshot"]; ok {
+					if s, ok := val.(string); ok && s != "" {
+						snapshotToRestore = s
+					}
+				}
+
+				// If not provided in Params, parse the first available snapshot.
+				if snapshotToRestore == "" {
 					snapshotToRestore, err = ParseSnapshot(output)
 					if err != nil {
 						log.Printf("Error parsing snapshot: %v", err)
