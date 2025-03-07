@@ -15,7 +15,7 @@ func ProcessJobs(cfg *Config) {
 			continue
 		}
 
-		// For each operation defined for this job.
+		// Process each operation defined for this job.
 		for _, op := range job.Operations {
 			switch op.Type {
 			case "RestoreSnapshot":
@@ -51,6 +51,20 @@ func ProcessJobs(cfg *Config) {
 					continue
 				}
 				log.Println("Snapshot restored successfully!")
+			case "StartVM":
+				log.Printf("Starting VM '%s'", vmConfig.VMName)
+				if err := vboxOperations.StartVM(vmConfig.VMName); err != nil {
+					log.Printf("Error starting VM: %v", err)
+					continue
+				}
+				log.Println("VM started successfully!")
+			case "PauseVM":
+				log.Printf("Pausing VM '%s'", vmConfig.VMName)
+				if err := vboxOperations.PauseVM(vmConfig.VMName); err != nil {
+					log.Printf("Error pausing VM: %v", err)
+					continue
+				}
+				log.Println("VM paused successfully!")
 			default:
 				log.Printf("Unknown operation type: %s", op.Type)
 			}
