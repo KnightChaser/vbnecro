@@ -11,8 +11,7 @@ func ProcessJobs(cfg *Config) {
 	for _, job := range cfg.Jobs {
 		vmConfig, err := GetVMConfig(cfg.VMs, job.VMAlias)
 		if err != nil {
-			log.Printf("Skipping job: %v", err)
-			continue
+			log.Fatalf("Job for VM alias '%s' failed: %v", job.VMAlias, err)
 		}
 
 		// Process each operation defined for this job.
@@ -22,8 +21,7 @@ func ProcessJobs(cfg *Config) {
 				log.Printf("Listing snapshots for VM '%s'", vmConfig.VMName)
 				output, err := vboxOperations.ListSnapshots(vmConfig.VMName)
 				if err != nil {
-					log.Printf("Error listing snapshots: %v", err)
-					continue
+					log.Fatalf("Job failed: error listing snapshots for VM '%s': %v", vmConfig.VMName, err)
 				}
 				fmt.Println("Snapshot list output:")
 				fmt.Println(output)
@@ -40,33 +38,32 @@ func ProcessJobs(cfg *Config) {
 				if snapshotToRestore == "" {
 					snapshotToRestore, err = vboxOperations.ParseSnapshot(output)
 					if err != nil {
-						log.Printf("Error parsing snapshot: %v", err)
-						continue
+						log.Fatalf("Job failed: error parsing snapshot for VM '%s': %v", vmConfig.VMName, err)
 					}
 				}
 
 				log.Printf("Restoring VM '%s' to snapshot '%s'", vmConfig.VMName, snapshotToRestore)
 				if err := vboxOperations.RestoreSnapshot(vmConfig.VMName, snapshotToRestore); err != nil {
-					log.Printf("Error restoring snapshot: %v", err)
-					continue
+					log.Fatalf("Job failed: error restoring snapshot for VM '%s': %v", vmConfig.VMName, err)
 				}
 				log.Println("Snapshot restored successfully!")
+
 			case "StartVM":
 				log.Printf("Starting VM '%s'", vmConfig.VMName)
 				if err := vboxOperations.StartVM(vmConfig.VMName); err != nil {
-					log.Printf("Error starting VM: %v", err)
-					continue
+					log.Fatalf("Job failed: error starting VM '%s': %v", vmConfig.VMName, err)
 				}
 				log.Println("VM started successfully!")
+
 			case "PauseVM":
 				log.Printf("Pausing VM '%s'", vmConfig.VMName)
 				if err := vboxOperations.PauseVM(vmConfig.VMName); err != nil {
-					log.Printf("Error pausing VM: %v", err)
-					continue
+					log.Fatalf("Job failed: error pausing VM '%s': %v", vmConfig.VMName, err)
 				}
 				log.Println("VM paused successfully!")
+
 			default:
-				log.Printf("Unknown operation type: %s", op.Type)
+				log.Fatalf("Job failed: unknown operation type: %s", op.Type)
 			}
 		}
 	}
