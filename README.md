@@ -17,8 +17,13 @@ Below is an example `config.yaml` file:
 vms:
   - alias: "vm/vbnecro_ubuntu2204"
     vm_name: "vbnecro_ubuntu2204"
-    username: "vbnecro"
-    password: "pass12##"
+    users:
+      - role: "user"
+        username: "vbnecro"
+        password: "pass12##"
+      - role: "root"
+        username: "root"
+        password: "pass12##"
 
 jobs:
   - vm_alias: "vm/vbnecro_ubuntu2204"
@@ -26,16 +31,22 @@ jobs:
     operations:
       - type: "RestoreSnapshot"
         params:
-          snapshot: "Setup003"
+          snapshot: "Setup004"
       - type: "StartVM"
       - type: "ExecuteShellCommand"
+        role: "user"
         params:
           command: "ls"
           args:
             - "-l"
             - "/home/vbnecro"
+      - type: "ExecuteShellCommand"
+        role: "root"
+        params:
+          command: "cat"
+          args:
+            - "/etc/passwd"
       - type: "ShutdownVM"
-
 ```
 
 ## Usage

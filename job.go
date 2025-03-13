@@ -53,16 +53,19 @@ func ProcessJobs(cfg *Config) {
 
 			case "ExecuteShellCommand":
 				log.Printf("Preparing to execute shell command on VM '%s'", vmConfig.VMName)
+
 				// Wait until the guest execution service is ready.
-				if err := vboxOperations.WaitForGuestExecReady(vmConfig.VMName, vmConfig.Username, vmConfig.Password, 60*time.Second); err != nil {
+				if err := vboxOperations.WaitForGuestExecReady(vmConfig.VMName, vmConfig.Users[0].Username, vmConfig.Users[0].Password, 60*time.Second); err != nil {
 					log.Fatalf("Job failed: guest execution service not ready on VM '%s': %v", vmConfig.VMName, err)
 				}
 				log.Printf("Guest execution service is ready on VM '%s'. Executing shell command...", vmConfig.VMName)
+
 				// Retrieve command.
 				cmdStr, ok := op.Params["command"].(string)
 				if !ok || cmdStr == "" {
 					log.Fatalf("Job failed: missing command parameter for ExecuteShellCommand")
 				}
+
 				// Retrieve optional arguments.
 				var args []string
 				if rawArgs, exists := op.Params["args"]; exists {
@@ -74,7 +77,20 @@ func ProcessJobs(cfg *Config) {
 						}
 					}
 				}
-				output, err := vboxOperations.ExecuteShellCommand(vmConfig.VMName, vmConfig.Username, vmConfig.Password, cmdStr, args...)
+
+				// Determine which role to use.
+				role := op.Role
+				if role == "" {
+					role = "user"
+				}
+
+				// Based on the role, get the credentials for correct user, and execute the command with the privileges of the specified user.
+				credentials, err := GetUserByRole(vmConfig, role)
+				if err != nil {
+					log.Fatalf("Job failed: %v", err)
+				}
+
+				output, err := vboxOperations.ExecuteShellCommand(vmConfig.VMName, credentials.Username, credentials.Password, cmdStr, args...)
 				if err != nil {
 					log.Fatalf("Job failed: error executing shell command: %v", err)
 				}
