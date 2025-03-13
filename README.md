@@ -14,6 +14,8 @@
 Below is an example `config.yaml` file:
 
 ```yaml
+vm_manager: "virtualbox"
+
 vms:
   - alias: "vm/vbnecro_ubuntu2204"
     vm_name: "vbnecro_ubuntu2204"

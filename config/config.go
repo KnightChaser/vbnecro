@@ -7,12 +7,6 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// Config represents the structure of our configuration file.
-type Config struct {
-	VMs  []VMConfig  `yaml:"vms"`
-	Jobs []JobConfig `yaml:"jobs"`
-}
-
 // VMUser represents a user credential with a role.
 type VMUser struct {
 	Role     string `yaml:"role"`
@@ -20,11 +14,20 @@ type VMUser struct {
 	Password string `yaml:"password"`
 }
 
-// VMConfig now includes a list of users.
+// VMConfig holds the VirtualBox VM configuration.
 type VMConfig struct {
 	Alias  string   `yaml:"alias"`
 	VMName string   `yaml:"vm_name"`
 	Users  []VMUser `yaml:"users"`
+}
+
+// Operation represents an operation to perform on a VM.
+// It includes optional Role and StoreAs fields.
+type Operation struct {
+	Type    string                 `yaml:"type"`
+	Role    string                 `yaml:"role,omitempty"`
+	StoreAs string                 `yaml:"store_as,omitempty"`
+	Params  map[string]interface{} `yaml:"params"`
 }
 
 // JobConfig represents a job to perform on a VM.
@@ -34,16 +37,15 @@ type JobConfig struct {
 	Operations []Operation `yaml:"operations"`
 }
 
-// Operation holds the type of operation, a role to execute it (if applicable),
-// and its parameters.
-type Operation struct {
-	Type    string                 `yaml:"type"`
-	Role    string                 `yaml:"role,omitempty"`
-	Params  map[string]interface{} `yaml:"params"`
-	StoreAs string                 `yaml:"store_as,omitempty"`
+// Config represents the complete configuration for the VM manager.
+// The vm_manager field is used to flexibly select the backend (e.g. "virtualbox").
+type Config struct {
+	VMManager string      `yaml:"vm_manager"`
+	VMs       []VMConfig  `yaml:"vms"`
+	Jobs      []JobConfig `yaml:"jobs"`
 }
 
-// LoadConfig reads and parses the YAML configuration.
+// loadConfig loads the configuration from the given file path.
 func LoadConfig(path string) (*Config, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
@@ -66,8 +68,7 @@ func GetVMConfig(vms []VMConfig, alias string) (*VMConfig, error) {
 	return nil, fmt.Errorf("VM with alias '%s' not found", alias)
 }
 
-// GetUserByRole returns the VMUser with the matching role.
-// If not found, it returns an error.
+// GetUserByRole returns the VMUser for the given role from a VMConfig.
 func GetUserByRole(vm *VMConfig, role string) (*VMUser, error) {
 	for _, user := range vm.Users {
 		if user.Role == role {
