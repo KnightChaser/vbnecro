@@ -40,12 +40,19 @@ jobs:
           args:
             - "-l"
             - "/home/vbnecro"
+        store_as: "listing_home"
       - type: "ExecuteShellCommand"
         role: "root"
         params:
           command: "cat"
           args:
             - "/etc/passwd"
+        store_as: "passwd_contents"
+      - type: "Assert"
+        params:
+          variable: "passwd_contents"
+          operator: "includes"
+          expected: "root:"
       - type: "ShutdownVM"
 ```
 

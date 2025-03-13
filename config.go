@@ -37,9 +37,10 @@ type JobConfig struct {
 // Operation holds the type of operation, a role to execute it (if applicable),
 // and its parameters.
 type Operation struct {
-	Type   string                 `yaml:"type"`
-	Role   string                 `yaml:"role,omitempty"`
-	Params map[string]interface{} `yaml:"params"`
+	Type    string                 `yaml:"type"`
+	Role    string                 `yaml:"role,omitempty"`
+	Params  map[string]interface{} `yaml:"params"`
+	StoreAs string                 `yaml:"store_as,omitempty"`
 }
 
 // LoadConfig reads and parses the YAML configuration.
