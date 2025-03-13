@@ -3,6 +3,8 @@ package main
 import (
 	"flag"
 	"log"
+
+	"vbnecro/config"
 )
 
 func main() {
@@ -14,7 +16,7 @@ func main() {
 	}
 
 	// Load configuration from YAML.
-	cfg, err := LoadConfig(*configPath)
+	cfg, err := config.LoadConfig(*configPath)
 	if err != nil {
 		log.Fatalf("Failed to load config from '%s': %v", *configPath, err)
 	}
