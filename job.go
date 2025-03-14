@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"strconv"
+	"time"
 
 	"github.com/sirupsen/logrus"
 	"vnecro/config"
@@ -87,6 +89,26 @@ func ProcessJobs(cfg *config.Config) {
 				opErr = jobs.ExecuteShellCommand(vmConfig, op, pipeline, operator)
 			case "Assert":
 				opErr = jobs.Assert(pipeline, op)
+			case "Wait":
+				// Just sleep for the specified duration ("seconds" from op.Params)
+				secondsStr, ok := op.Params["seconds"].(string)
+				if !ok || secondsStr == "" {
+					opErr = fmt.Errorf("missing 'seconds' parameter for Wait operation")
+					break
+				}
+				seconds, err := strconv.Atoi(secondsStr)
+				if err != nil {
+					opErr = fmt.Errorf("invalid 'seconds' parameter for Wait operation: %w", err)
+					break
+				}
+
+				// Notify wait operation and actually wait for the specified duration
+				logrus.Infof("Pausing execution for %d seconds (current time: %s, resuming at: %s)",
+					seconds,
+					time.Now().Format("2006-01-02 15:04:05"),
+					time.Now().Add(time.Duration(seconds)*time.Second).Format("2006-01-02 15:04:05"))
+				time.Sleep(time.Duration(seconds) * time.Second)
+
 			default:
 				opErr = fmt.Errorf("unknown operation type: %s", op.Type)
 			}
