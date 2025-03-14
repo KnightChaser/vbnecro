@@ -24,10 +24,11 @@ type VMConfig struct {
 // Operation represents an operation to perform on a VM.
 // It includes optional Role and StoreAs fields.
 type Operation struct {
-	Type    string                 `yaml:"type"`
-	Role    string                 `yaml:"role,omitempty"`
-	StoreAs string                 `yaml:"store_as,omitempty"`
-	Params  map[string]interface{} `yaml:"params"`
+	Type        string                 `yaml:"type"`
+	Role        string                 `yaml:"role,omitempty"`
+	StoreAs     string                 `yaml:"store_as,omitempty"`
+	Params      map[string]interface{} `yaml:"params"`
+	PrintOutput bool                   `yaml:"print_output,omitempty"`
 }
 
 // JobConfig represents a job to perform on a VM.

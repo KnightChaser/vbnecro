@@ -47,7 +47,11 @@ func ExecuteShellCommand(vmConfig *config.VMConfig, op config.Operation, pipelin
 	if err != nil {
 		log.Fatalf("Job failed: error executing shell command: %v", err)
 	}
-	log.Printf("Shell command output: %s", output)
+
+	// Print the log output only if requested.
+	if op.PrintOutput {
+		log.Printf("Shell command output: %s", output)
+	}
 
 	// If "store_as" is specified, store the output in the pipeline.
 	if op.StoreAs != "" {
