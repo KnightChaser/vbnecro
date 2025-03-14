@@ -21,6 +21,9 @@ type VMOperator interface {
 	// RestoreSnapshot reverts the virtual machine to the specified snapshot.
 	RestoreSnapshot(vmName, snapshot string) error
 
+	// Rollback reverts the virtual machine to the specified snapshot in case of contingencies.
+	Rollback(vmName, snapshot string) error
+
 	// ListSnapshots returns a string with the list of snapshots for the virtual machine.
 	ListSnapshots(vmName string) (string, error)
 
@@ -62,6 +65,11 @@ func (v *VirtualBoxOperator) Shutdown(vmName string) error {
 // RestoreSnapshot reverts the virtual machine to a specified snapshot.
 func (v *VirtualBoxOperator) RestoreSnapshot(vmName, snapshot string) error {
 	return vboxOperations.RestoreSnapshot(vmName, snapshot)
+}
+
+// Rollback reverts the virtual machine to the specified snapshot in case of contingencies.
+func (v *VirtualBoxOperator) Rollback(vmName, snapshot string) error {
+	return vboxOperations.Rollback(vmName, snapshot)
 }
 
 // ListSnapshots returns the snapshot list of a virtual machine.

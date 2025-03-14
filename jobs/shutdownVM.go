@@ -1,16 +1,20 @@
 package jobs
 
 import (
-	"github.com/sirupsen/logrus"
+	"fmt"
 
+	"github.com/sirupsen/logrus"
 	"vnecro/config"
 	"vnecro/vmOperations"
 )
 
-func ShutdownVM(vmConfig *config.VMConfig, operator vmOperations.VMOperator) {
-	logrus.Printf("Shutting down VM '%s'", vmConfig.VMName)
+// ShutdownVM shuts down the VM specified in vmConfig using the provided operator.
+// Returns an error if the shutdown fails.
+func ShutdownVM(vmConfig *config.VMConfig, operator vmOperations.VMOperator) error {
+	logrus.Infof("Shutting down VM '%s'", vmConfig.VMName)
 	if err := operator.Shutdown(vmConfig.VMName); err != nil {
-		logrus.Fatalf("Job failed: error shutting down VM '%s': %v", vmConfig.VMName, err)
+		return fmt.Errorf("error shutting down VM '%s': %w", vmConfig.VMName, err)
 	}
-	logrus.Println("VM shut down successfully!")
+	logrus.Info("VM shut down successfully!")
+	return nil
 }

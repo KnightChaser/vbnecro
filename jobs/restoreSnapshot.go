@@ -1,19 +1,24 @@
 package jobs
 
 import (
+	"fmt"
+
 	"github.com/sirupsen/logrus"
 	"vnecro/config"
 	"vnecro/vmOperations"
 )
 
-func RestoreSnapshot(vmConfig *config.VMConfig, op config.Operation, operator vmOperations.VMOperator) {
-	logrus.Printf("Listing snapshots for VM '%s'", vmConfig.VMName)
+// RestoreSnapshot restores the given VM to a specified snapshot.
+// It first lists the snapshots, then either uses the provided snapshot name or parses the first available one.
+// Returns an error if any step fails.
+func RestoreSnapshot(vmConfig *config.VMConfig, op config.Operation, operator vmOperations.VMOperator) error {
+	logrus.Infof("Listing snapshots for VM '%s'", vmConfig.VMName)
 	output, err := operator.ListSnapshots(vmConfig.VMName)
 	if err != nil {
-		logrus.Fatalf("Job failed: error listing snapshots for VM '%s': %v", vmConfig.VMName, err)
+		return fmt.Errorf("error listing snapshots for VM '%s': %w", vmConfig.VMName, err)
 	}
-	logrus.Println("Snapshot list output:")
-	logrus.Println(output)
+	logrus.Info("Snapshot list output:")
+	logrus.Info(output)
 
 	var snapshotToRestore string
 	if val, ok := op.Params["snapshot"].(string); ok && val != "" {
@@ -22,12 +27,13 @@ func RestoreSnapshot(vmConfig *config.VMConfig, op config.Operation, operator vm
 	if snapshotToRestore == "" {
 		snapshotToRestore, err = operator.ParseSnapshot(output)
 		if err != nil {
-			logrus.Fatalf("Job failed: error parsing snapshot for VM '%s': %v", vmConfig.VMName, err)
+			return fmt.Errorf("error parsing snapshot for VM '%s': %w", vmConfig.VMName, err)
 		}
 	}
-	logrus.Printf("Restoring VM '%s' to snapshot '%s'", vmConfig.VMName, snapshotToRestore)
+	logrus.Infof("Restoring VM '%s' to snapshot '%s'", vmConfig.VMName, snapshotToRestore)
 	if err := operator.RestoreSnapshot(vmConfig.VMName, snapshotToRestore); err != nil {
-		logrus.Fatalf("Job failed: error restoring snapshot for VM '%s': %v", vmConfig.VMName, err)
+		return fmt.Errorf("error restoring snapshot for VM '%s': %w", vmConfig.VMName, err)
 	}
-	logrus.Println("Snapshot restored successfully!")
+	logrus.Info("Snapshot restored successfully!")
+	return nil
 }

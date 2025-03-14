@@ -1,15 +1,19 @@
 package jobs
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/sirupsen/logrus"
-
 	"vnecro/config"
 	"vnecro/vmOperations"
 )
 
-func ExecuteShellCommand(vmConfig *config.VMConfig, op config.Operation, pipeline map[string]string, operator vmOperations.VMOperator) {
+// ExecuteShellCommand executes a shell command on the given VM using the provided operator.
+// It waits for the guest execution service to be ready, retrieves the command and arguments,
+// executes the command, and optionally prints and stores the output in the pipeline.
+// Returns an error if any step fails.
+func ExecuteShellCommand(vmConfig *config.VMConfig, op config.Operation, pipeline map[string]string, operator vmOperations.VMOperator) error {
 	// Determine which role to use (default to "user" if not specified).
 	role := op.Role
 	if role == "" {
@@ -17,21 +21,21 @@ func ExecuteShellCommand(vmConfig *config.VMConfig, op config.Operation, pipelin
 	}
 	credentials, err := config.GetUserByRole(vmConfig, role)
 	if err != nil {
-		logrus.Fatalf("Job failed: %v", err)
+		return fmt.Errorf("error retrieving user for role '%s': %w", role, err)
 	}
 
 	// Wait until the guest execution service is ready.
-
 	if err := operator.WaitForGuestExecReady(vmConfig.VMName, credentials.Username, credentials.Password, 60*time.Second); err != nil {
-		logrus.Fatalf("Job failed: guest execution service not ready on VM '%s': %v", vmConfig.VMName, err)
+		return fmt.Errorf("guest execution service not ready on VM '%s': %w", vmConfig.VMName, err)
 	}
-	logrus.Printf("Guest execution service is ready on VM '%s'. Executing shell command...", vmConfig.VMName)
+	logrus.Infof("Guest execution service is ready on VM '%s'. Executing shell command...", vmConfig.VMName)
 
-	// Retrieve command.
+	// Retrieve command from parameters.
 	cmdStr, ok := op.Params["command"].(string)
 	if !ok || cmdStr == "" {
-		logrus.Fatalf("Job failed: missing command parameter for ExecuteShellCommand")
+		return fmt.Errorf("missing command parameter for ExecuteShellCommand")
 	}
+
 	// Retrieve optional arguments.
 	var args []string
 	if rawArgs, exists := op.Params["args"]; exists {
@@ -44,19 +48,22 @@ func ExecuteShellCommand(vmConfig *config.VMConfig, op config.Operation, pipelin
 		}
 	}
 
+	// Execute the shell command.
 	output, err := operator.ExecuteShellCommand(vmConfig.VMName, credentials.Username, credentials.Password, cmdStr, args...)
 	if err != nil {
-		logrus.Fatalf("Job failed: error executing shell command: %v", err)
+		return fmt.Errorf("error executing shell command: %w", err)
 	}
 
-	// Print the logrus output only if requested.
+	// Print the output if requested.
 	if op.PrintOutput {
-		logrus.Printf("Shell command output: %s", output)
+		logrus.Infof("Shell command output: %s", output)
 	}
 
 	// If "store_as" is specified, store the output in the pipeline.
 	if op.StoreAs != "" {
 		pipeline[op.StoreAs] = output
-		logrus.Printf("Stored output in variable '%s'", op.StoreAs)
+		logrus.Infof("Stored output in variable '%s'", op.StoreAs)
 	}
+
+	return nil
 }

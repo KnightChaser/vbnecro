@@ -1,16 +1,20 @@
 package jobs
 
 import (
-	"github.com/sirupsen/logrus"
+	"fmt"
 
+	"github.com/sirupsen/logrus"
 	"vnecro/config"
 	"vnecro/vmOperations"
 )
 
-func PauseVM(vmConfig *config.VMConfig, operator vmOperations.VMOperator) {
-	logrus.Printf("Pausing VM '%s'", vmConfig.VMName)
+// PauseVM pauses the virtual machine specified in vmConfig using the provided operator.
+// It returns an error if the operation fails.
+func PauseVM(vmConfig *config.VMConfig, operator vmOperations.VMOperator) error {
+	logrus.Infof("Pausing VM '%s'", vmConfig.VMName)
 	if err := operator.Pause(vmConfig.VMName); err != nil {
-		logrus.Fatalf("Job failed: error pausing VM '%s': %v", vmConfig.VMName, err)
+		return fmt.Errorf("error pausing VM '%s': %w", vmConfig.VMName, err)
 	}
-	logrus.Println("VM paused successfully!")
+	logrus.Info("VM paused successfully!")
+	return nil
 }

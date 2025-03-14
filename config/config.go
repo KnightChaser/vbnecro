@@ -33,9 +33,10 @@ type Operation struct {
 
 // JobConfig represents a job to perform on a VM.
 type JobConfig struct {
-	VMAlias    string      `yaml:"vm_alias"`
-	EnsureOff  bool        `yaml:"ensure_off,omitempty"`
-	Operations []Operation `yaml:"operations"`
+	VMAlias           string      `yaml:"vm_alias"`
+	EnsureOff         bool        `yaml:"ensure_off,omitempty"`
+	RollbackOnFailure string      `yaml:"rollback_on_failure,omitempty"`
+	Operations        []Operation `yaml:"operations"`
 }
 
 // Config represents the complete configuration for the VM manager.
