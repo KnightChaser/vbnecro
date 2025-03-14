@@ -31,6 +31,7 @@ vms:
 jobs:
   - vm_alias: "vm/vbnecro_ubuntu2204"
     ensure_off: true
+    rollback_on_failure: "Setup004"
     operations:
       - type: "RestoreSnapshot"
         params:
@@ -39,11 +40,9 @@ jobs:
       - type: "ExecuteShellCommand"
         role: "user"
         params:
-          command: "ls"
-          args:
-            - "-l"
-            - "/home/vbnecro"
-        store_as: "listing_home"
+          command: "whoami"
+        store_as: "real_username"
+        print_output: false
       - type: "ExecuteShellCommand"
         role: "root"
         params:
@@ -51,6 +50,10 @@ jobs:
           args:
             - "/etc/passwd"
         store_as: "passwd_contents"
+        print_output: true
+      - type: "Wait"
+        params:
+          seconds: "10"
       - type: "Assert"
         params:
           variable: "passwd_contents"
