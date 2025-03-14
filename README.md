@@ -1,13 +1,14 @@
-# vbnecro
+# vnecro
 > **This project is under development and not stable. It's currently under at idea realization phase.** 
 
-`vbnecro` is a simple tool for controlling VirtualBox machines, especially Linux-based guests. It allows you to perform operations such as managing snapshots, starting, executing shell commands inside the guest, and shutting down the VMs.
+`vnecro` is a simple tool for controlling virtual machines, especially Linux-based guests. It allows you to perform operations such as managing snapshots, starting, executing shell commands inside the guest, and shutting down the VMs.
 
 ## Constraints
 
 - **Manual Setup:** Users must manually configure the machines on VirtualBox.
 - **Guest Additions:** The guest OS must have VirtualBox Guest Additions installed.
 - **Auto-Login:** For guest control commands to work reliably, auto-login must be enabled on the guest.
+- Also note that this project is currently support only Virtualbox.
 
 ## Example Configuration File
 
