@@ -2,6 +2,7 @@ package jobs
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -54,9 +55,15 @@ func ExecuteShellCommand(vmConfig *config.VMConfig, op config.Operation, pipelin
 		return fmt.Errorf("error executing shell command: %w", err)
 	}
 
-	// Print the output if requested.
+	// If PrintOutput is true, print a structured log.
 	if op.PrintOutput {
-		logrus.Infof("Shell command output: %s", output)
+		fullCommand := cmdStr
+		if len(args) > 0 {
+			fullCommand += " " + strings.Join(args, " ")
+		}
+		logrus.Infof("Shell command executed on VM '%s':", vmConfig.VMName)
+		logrus.Infof(" - Executed command: %s", fullCommand)
+		logrus.Infof(" - Executed command result:\n%s", boxOutput(output))
 	}
 
 	// If "store_as" is specified, store the output in the pipeline.
@@ -66,4 +73,25 @@ func ExecuteShellCommand(vmConfig *config.VMConfig, op config.Operation, pipelin
 	}
 
 	return nil
+}
+
+// boxOutput returns the given text surrounded by an ASCII box.
+func boxOutput(output string) string {
+	lines := strings.Split(output, "\n")
+	maxLen := 0
+	for _, line := range lines {
+		if len(line) > maxLen {
+			maxLen = len(line)
+		}
+	}
+
+	// Create a top and bottom border.
+	border := "+" + strings.Repeat("-", maxLen+2) + "+"
+	var sb strings.Builder
+	sb.WriteString(border + "\n")
+	for _, line := range lines {
+		sb.WriteString(fmt.Sprintf("| %-*s |\n", maxLen, line))
+	}
+	sb.WriteString(border)
+	return sb.String()
 }
