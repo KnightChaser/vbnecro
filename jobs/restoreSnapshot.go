@@ -3,8 +3,8 @@ package jobs
 import (
 	"log"
 
-	"vbnecro/config"
-	"vbnecro/vmOperations"
+	"vnecro/config"
+	"vnecro/vmOperations"
 )
 
 func RestoreSnapshot(vmConfig *config.VMConfig, op config.Operation, operator vmOperations.VMOperator) {

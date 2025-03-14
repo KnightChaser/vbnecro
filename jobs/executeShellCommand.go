@@ -4,8 +4,8 @@ import (
 	"log"
 	"time"
 
-	"vbnecro/config"
-	"vbnecro/vmOperations"
+	"vnecro/config"
+	"vnecro/vmOperations"
 )
 
 func ExecuteShellCommand(vmConfig *config.VMConfig, op config.Operation, pipeline map[string]string, operator vmOperations.VMOperator) {

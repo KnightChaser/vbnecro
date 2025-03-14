@@ -3,8 +3,8 @@ package jobs
 import (
 	"log"
 
-	"vbnecro/config"
-	"vbnecro/vmOperations"
+	"vnecro/config"
+	"vnecro/vmOperations"
 )
 
 func ShutdownVM(vmConfig *config.VMConfig, operator vmOperations.VMOperator) {

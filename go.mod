@@ -1,4 +1,4 @@
-module vbnecro
+module vnecro
 
 go 1.24.1
 

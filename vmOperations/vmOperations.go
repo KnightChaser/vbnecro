@@ -3,7 +3,7 @@ package vmOperations
 import (
 	"time"
 
-	"vbnecro/vboxOperations"
+	"vnecro/vboxOperations"
 )
 
 // VMOperator defines the interface for performing operations on virtual machines.

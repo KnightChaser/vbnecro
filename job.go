@@ -3,9 +3,9 @@ package main
 import (
 	"log"
 
-	"vbnecro/config"
-	"vbnecro/jobs"
-	"vbnecro/vmOperations"
+	"vnecro/config"
+	"vnecro/jobs"
+	"vnecro/vmOperations"
 )
 
 func ProcessJobs(cfg *config.Config) {

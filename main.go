@@ -4,7 +4,7 @@ import (
 	"flag"
 	"log"
 
-	"vbnecro/config"
+	"vnecro/config"
 )
 
 func main() {

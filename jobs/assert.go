@@ -3,8 +3,8 @@ package jobs
 import (
 	"log"
 
-	"vbnecro/config"
-	"vbnecro/vboxOperations"
+	"vnecro/config"
+	"vnecro/vboxOperations"
 )
 
 func Assert(pipeline map[string]string, op config.Operation) {
