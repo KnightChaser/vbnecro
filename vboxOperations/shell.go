@@ -3,14 +3,15 @@ package vboxOperations
 import (
 	"bytes"
 	"fmt"
-	"log"
 	"os/exec"
 	"strings"
 	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 // WaitForGuestExecReady polls the guest execution service by trying to run a simple echo command.
-// It will keep retrying until the command succeeds or the timeout is reached, printing a log message each second.
+// It will keep retrying until the command succeeds or the timeout is reached, printing a logrus message each second.
 func WaitForGuestExecReady(vmName, username, password string, timeout time.Duration) error {
 	deadline := time.Now().Add(timeout)
 	// Ensure the dummy command uses an absolute path.
@@ -42,7 +43,7 @@ func WaitForGuestExecReady(vmName, username, password string, timeout time.Durat
 			return fmt.Errorf("timeout waiting for guest execution service to be ready: last error: %v, output: %s", err, out.String())
 		}
 		// Print a waiting message every second.
-		log.Printf("Waiting for guest execution service to be ready on VM '%s' (%d / %d seconds)", vmName, currentSecond, int(timeout.Seconds()))
+		logrus.Printf("Waiting for guest execution service to be ready on VM '%s' (%d / %d seconds)", vmName, currentSecond, int(timeout.Seconds()))
 		currentSecond++
 		time.Sleep(1 * time.Second)
 	}

@@ -1,16 +1,16 @@
 package jobs
 
 import (
-	"log"
+	"github.com/sirupsen/logrus"
 
 	"vnecro/config"
 	"vnecro/vmOperations"
 )
 
 func StartVM(vmConfig *config.VMConfig, operator vmOperations.VMOperator) {
-	log.Printf("Starting VM '%s'", vmConfig.VMName)
+	logrus.Printf("Starting VM '%s'", vmConfig.VMName)
 	if err := operator.Start(vmConfig.VMName); err != nil {
-		log.Fatalf("Job failed: error starting VM '%s': %v", vmConfig.VMName, err)
+		logrus.Fatalf("Job failed: error starting VM '%s': %v", vmConfig.VMName, err)
 	}
-	log.Println("VM started successfully!")
+	logrus.Println("VM started successfully!")
 }
